@@ -9,7 +9,7 @@ from infrastructure.db.xml.artist_repository import XmlArtistRepository
 from infrastructure.db.xml.track_repository import XmlTrackRepository
 from presentation.console import Console, read_line
 
-# Пункт выбора при запуске и соответствующий формат файлов.
+# Пункт выбора при запуске и соответствующий формат файлов
 STORAGE_FORMATS = {"1": "xml", "2": "json"}
 
 
