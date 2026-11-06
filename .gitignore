@@ -1,4 +1,4 @@
-# Python
+# Python скомпилированный код
 __pycache__/
 *.py[cod]
 
@@ -11,7 +11,3 @@ __pycache__/
 # IDE
 .idea/
 .vscode/
-
-# macOS
-.DS_Store
-data/
