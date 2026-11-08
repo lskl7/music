@@ -15,28 +15,22 @@ from infrastructure.db.json.storage import read_records, write_records
 ROOT = "tracks"
 
 
-# Хранит треки в JSON-файле вида {"tracks": [...]}.
-# Каждая операция заново читает файл и сразу записывает изменения.
 class JsonTrackRepository:
     def __init__(self, file_path: str | Path) -> None:
         self.__file_path = Path(file_path)
 
     def add(self, track: Track) -> None:
         records = read_records(self.__file_path, ROOT)
-
         if self.__find_index(records, track.id) is not None:
             raise AlreadyExistsError(f"Трек {track.id} уже существует")
-
         records.append(self.__to_dict(track))
         write_records(self.__file_path, ROOT, records)
 
     def get_by_id(self, track_id: int) -> Track | None:
         records = read_records(self.__file_path, ROOT)
         index = self.__find_index(records, track_id)
-
         if index is None:
             return None
-
         return self.__to_track(records[index])
 
     def get_all(self) -> list[Track]:
@@ -48,31 +42,24 @@ class JsonTrackRepository:
     def update(self, track: Track) -> None:
         records = read_records(self.__file_path, ROOT)
         index = self.__find_index(records, track.id)
-
         if index is None:
             raise NotFoundError(f"Трек {track.id} не найден")
-
         records[index] = self.__to_dict(track)
         write_records(self.__file_path, ROOT, records)
 
     def delete(self, track_id: int) -> None:
         records = read_records(self.__file_path, ROOT)
         index = self.__find_index(records, track_id)
-
         if index is None:
             raise NotFoundError(f"Трек {track_id} не найден")
-
         del records[index]
         write_records(self.__file_path, ROOT, records)
 
     @staticmethod
-    def __find_index(
-            records: list[dict[str, Any]], track_id: int
-    ) -> int | None:
+    def __find_index(records: list[dict[str, Any]], track_id: int) -> int | None:
         for index, record in enumerate(records):
             if record.get("id") == (track_id):
                 return index
-
         return None
 
     @staticmethod
@@ -84,7 +71,7 @@ class JsonTrackRepository:
             "duration": track.duration.seconds,
         }
 
-    # Любая ошибка разбора превращается в StorageError.
+    # Любая ошибка разбора превращается в StorageError
     def __to_track(self, record: dict[str, Any]) -> Track:
         try:
             return Track(
