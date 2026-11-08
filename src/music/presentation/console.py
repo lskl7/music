@@ -24,33 +24,23 @@ MENU = """
 0 - выход
 """
 
-
-# Терминал иногда передает обрывки байтов кириллицы.
-# Возвращаем их в байты и отбрасываем то, что не декодируется.
+# Терминал иногда передает обрывки байтов кириллицы
 def read_line(prompt: str) -> str:
     raw = input(prompt)
     return raw.encode("utf-8", "surrogateescape").decode("utf-8", "ignore")
 
 
-# Ввод с проверкой: неверное значение превращается в ValidationError,
-# который консоль покажет пользователю.
+# Ввод с проверкой: неверное значение превращается в ValidationError
 def ask_int(prompt: str) -> int:
     raw = read_line(prompt).strip()
-
     try:
         return int(raw)
     except ValueError as error:
         raise ValidationError("Введите целое число") from error
 
 
-# Плоское меню без подменю. Консоль только спрашивает пользователя
-# и печатает результат, а правила живут в сервисах и классах.
 class Console:
-    def __init__(
-            self,
-            artist_service: ArtistService,
-            track_service: TrackService
-    ) -> None:
+    def __init__(self, artist_service: ArtistService, track_service: TrackService) -> None:
         self.__artist_service = artist_service
         self.__track_service = track_service
 
@@ -71,22 +61,18 @@ class Console:
             while True:
                 print(MENU)
                 choice = read_line("Выберите пункт: ").strip()
-
                 if choice == "0":
                     print("До свидания")
                     return
-
                 action = actions.get(choice)
-
                 if action is None:
                     print("Такого пункта нет")
                     continue
-
                 self.__run_action(action)
         except (KeyboardInterrupt, EOFError):
             print()
 
-    # Ошибки предметной области и ввода не завершают программу.
+    # Ошибки предметной области и ввода не завершают программу
     @staticmethod
     def __run_action(action: Callable[[], None]) -> None:
         try:
@@ -98,10 +84,8 @@ class Console:
 
     def __show_artists(self) -> None:
         artists = self.__artist_service.get_all_artists()
-
         if not artists:
             print("Исполнителей пока нет")
-
         for artist in artists:
             self.__print_artist(artist)
 
@@ -111,7 +95,6 @@ class Console:
             name=ArtistName(read_line("Имя исполнителя: ")),
             genre=Genre(read_line("Жанр: ")),
         )
-
         self.__artist_service.add_artist(artist)
         print(f"Исполнитель добавлен, id: {artist.id}")
 
@@ -119,7 +102,6 @@ class Console:
         artist_id = ask_int("id исполнителя: ")
         name = ArtistName(read_line("Новое имя: "))
         genre = Genre(read_line("Новый жанр: "))
-
         self.__artist_service.change_artist(artist_id, name, genre)
         print("Исполнитель изменен")
 
@@ -159,7 +141,6 @@ class Console:
     def __print_tracks(self, tracks: list[Track]) -> None:
         if not tracks:
             print("Треков нет")
-
         for track in tracks:
             print(
                 f"{track.id} | {track.title.value} | "
